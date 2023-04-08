@@ -16,6 +16,9 @@ var defaultApps = []string{"git", "go", "vim"}
 
 func main() {
 	var appList []string
+	
+	// Check if Homebrew is installed and install if not. Throw error if Homebrew installation fails.
+	installHomebrew() 
 
 	// Parse flags
 	addApps := flag.String("add", "", "Add additional apps (separate by space)")
@@ -23,23 +26,11 @@ func main() {
 	installAll := flag.Bool("install-all", false, "Install all apps")
 	flag.Parse()
 
-	if *addApps != "" {
-		fmt.Printf("\nAdditional apps to be installed: %s \n", *addApps)
-		defaultApps = append(defaultApps, strings.Split(*addApps, " ")...)
-	}
+	// If -add flag is set, add apps to default app list
+	addAppsHandler(&defaultApps, *addApps)		
 
-	if *removeApps != "" && isElementInSlice(defaultApps, *removeApps) {
-		fmt.Printf("\nRemoved the following app(s): %s \n", *removeApps)
-		removedApps := strings.Split(*removeApps, " ")
-		for _, app := range removedApps {
-			for i, a := range defaultApps {
-				if a == app {
-					defaultApps = append(defaultApps[:i], defaultApps[i+1:]...)
-					break
-				}
-			}
-		}
-	}		
+	// If -remove flag is set, remove apps from default app list
+	removeAppsHandler(&defaultApps, *removeApps)
 
 	// If -install-all flag is set, use default app list
 	if *installAll {
@@ -82,6 +73,47 @@ func main() {
 	installSelectedApps(appList)
 }
 
+
+
+func installHomebrew() {
+	// Check if Homebrew is already installed
+	_, err := exec.LookPath("brew")
+	if err == nil {
+		fmt.Println("Homebrew is already installed.")
+		return
+	}
+
+	// Install Homebrew
+	cmd := exec.Command("/bin/bash", "-c", "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)")
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		log.Fatalf("Error installing Homebrew: %v", err)
+	}
+	fmt.Println("Homebrew has been installed.")
+}
+
+func addAppsHandler(appList *[]string, addApps string) {
+	if addApps != "" {
+		fmt.Printf("\nAdditional apps to be installed: %s \n", addApps)
+		defaultApps = append(defaultApps, strings.Split(addApps, " ")...)
+	}
+}
+
+func removeAppsHandler(appList *[]string, removeApps string) {
+	if removeApps != "" && isElementInSlice(defaultApps, removeApps) {
+		fmt.Printf("\nRemoved the following app(s): %s \n", removeApps)
+		removedApps := strings.Split(removeApps, " ")
+		for _, app := range removedApps {
+			for i, a := range defaultApps {
+				if a == app {
+					defaultApps = append(defaultApps[:i], defaultApps[i+1:]...)
+					break
+				}
+			}
+		}
+	}
+}
+
 func addAppsToList(appList *[]string) ([]string, error ){
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Write the name of the apps you want to add (separate by space): ")
@@ -95,14 +127,24 @@ func addAppsToList(appList *[]string) ([]string, error ){
 }
 
 func isElementInSlice(slice []string, target string) bool {
-    for _, element := range slice {
-        if element == target {
-            return true
-        }
-    }
-	fmt.Printf("\nApp(s) %s is not in the list of apps to be installed. Exiting...\n\n", target)
-	os.Exit(0)
-    return false
+	var notFound []string
+	for _, s := range strings.Split(target, " ") {
+		found := false
+		for _, e := range slice {
+			if e == s {
+				found = true
+				break
+			}
+		}
+		if !found {
+			notFound = append(notFound, s)
+		}
+	}
+	if len(notFound) == 0 {
+		return true
+	}
+	fmt.Printf("\nApp(s) %s is not in the list of apps to be installed. Exiting...\n\n", notFound)
+	return false
 }
 
 
@@ -114,7 +156,6 @@ func removeAppsFromList(appList *[]string) ([]string, error) {
 	if apps != "" {
 		removedApps := strings.Split(apps, " ")
 		if !isElementInSlice(*appList, apps) {
-			fmt.Printf("\nApp(s) %s is not in the list of apps to be installed. Exiting...\n\n", apps)
 			os.Exit(0)
 		}
 		for _, app := range removedApps {
