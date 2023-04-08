@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 )
 
 var defaultApps = []string{"git", "go", "vim"}
@@ -59,9 +60,19 @@ func main() {
 			text, _ := reader.ReadString('\n')
 			switch strings.TrimSpace(strings.ToLower(text)) {
 			case "add":
-				appList = addAppsToList(appList, *addApps)
+				appList, err := addAppsToList(&appList)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Printf("\nAdditional apps to be installed: %s \n", *addApps)
+				fmt.Printf("\nApp list: %s \n", appList)
 			case "remove":
-				appList = removeAppsFromList(appList, *removeApps)
+				appList, err := removeAppsFromList(&appList)
+				if err != nil {
+					log.Fatal(err)
+				}
+				fmt.Printf("\nRemoved the following app(s): %s \n", *addApps)
+				fmt.Printf("\nApp list: %s \n", appList)
 			default:
 				fmt.Println("Invalid flag. No apps will be installed.")
 				os.Exit(0)
@@ -71,12 +82,16 @@ func main() {
 	installSelectedApps(appList)
 }
 
-func addAppsToList(appList []string, apps string) []string {
+func addAppsToList(appList *[]string) ([]string, error ){
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Write the name of the apps you want to add (separate by space): ")
+	text, _ := reader.ReadString('\n')
+	apps := strings.TrimSpace(text)
 	if apps != "" {
 		addedApps := strings.Split(apps, " ")
-		appList = append(appList, addedApps...)
+		*appList = append(*appList, addedApps...)
 	}
-	return appList
+	return *appList, nil
 }
 
 func isElementInSlice(slice []string, target string) bool {
@@ -91,27 +106,32 @@ func isElementInSlice(slice []string, target string) bool {
 }
 
 
-func removeAppsFromList(appList []string, apps string) []string {
+func removeAppsFromList(appList *[]string) ([]string, error) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Write the name of the apps you want to remove (separate by space): ")
 	text, _ := reader.ReadString('\n')
-	apps = strings.TrimSpace(text)
+	apps := strings.TrimSpace(text)
 	if apps != "" {
 		removedApps := strings.Split(apps, " ")
+		if !isElementInSlice(*appList, apps) {
+			fmt.Printf("\nApp(s) %s is not in the list of apps to be installed. Exiting...\n\n", apps)
+			os.Exit(0)
+		}
 		for _, app := range removedApps {
-			for i, a := range appList {
+			for i, a := range *appList {
 				if a == app {
-					appList = append(appList[:i], appList[i+1:]...)
+					*appList = append((*appList)[:i], (*appList)[i+1:]...)
 					break
 				}
 			}
 		}
 	}
-	listAppsToBeInstalled(appList)
-	return appList
+	listAppsToBeInstalled(*appList)
+	return *appList, nil
 }
 
-func installSelectedApps(appList []string) {
+func installSelectedApps(appList []string)  error {
+	start := time.Now()
 	var wg sync.WaitGroup
 	for _, app := range appList {
 		wg.Add(1)
@@ -124,9 +144,11 @@ func installSelectedApps(appList []string) {
 		}(app)
 	}
 	wg.Wait()
+	fmt.Printf("All apps have been installed in %s\n", time.Since(start))
+	return nil
 }
 
-func listAppsToBeInstalled(appList []string) {
+func listAppsToBeInstalled(appList []string) error {
 	if len(appList) == 0 {
 		fmt.Println("No apps will be installed because the list of app is empty. Exiting...")
 		os.Exit(0)
@@ -135,6 +157,7 @@ func listAppsToBeInstalled(appList []string) {
 	for _, app := range appList {
 		fmt.Printf("- %s\n", app)
 	}
+	return nil
 }
 
 
@@ -144,4 +167,3 @@ func runCommand(name string, arg ...string) error {
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
 }
-
