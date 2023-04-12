@@ -1,3 +1,3 @@
-module main
+module ogi
 
 go 1.20
