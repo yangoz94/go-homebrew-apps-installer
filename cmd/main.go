@@ -17,7 +17,7 @@ type Config struct {
 }
 
 func main() {
-	configFile, err := os.ReadFile("pkg/config/config.json")
+	configFile, err := os.ReadFile("config/config.json")
 	if err != nil {
 		log.Fatalf("Error reading config file: %v", err)
 	}
