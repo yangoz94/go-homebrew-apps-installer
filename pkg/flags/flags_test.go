@@ -91,21 +91,21 @@ func TestRemoveAppsHandler(t *testing.T) {
 			expected:   []string{"app1", "app3"},
 			wantErr:    false,
 		},
-        {
-            name:       "Test removing an empty string from an app list",
-            appList:    []string{"app1", "app2", "app3"},
-            removeApps: "",
-            expected:   []string{"app1", "app2", "app3"},
-            wantErr:    true,
-        },
-        {
-            name:       "Test removing an app that is not in the app list",
-            appList:    []string{"app1", "app2", "app3"},
-            removeApps: "app4",
-            expected:   []string{"app1", "app2", "app3"},
-            wantErr:    true,
-        },
-    }
+		{
+			name:       "Test removing an empty string from an app list",
+			appList:    []string{"app1", "app2", "app3"},
+			removeApps: "",
+			expected:   []string{"app1", "app2", "app3"},
+			wantErr:    true,
+		},
+		{
+			name:       "Test removing an app that is not in the app list",
+			appList:    []string{"app1", "app2", "app3"},
+			removeApps: "app4",
+			expected:   []string{"app1", "app2", "app3"},
+			wantErr:    true,
+		},
+	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
@@ -118,7 +118,7 @@ func TestRemoveAppsHandler(t *testing.T) {
 				t.Errorf("Expected app list %v, got %v", test.expected, test.appList)
 			}
 		})
-    }
+	}
 }
 
 type mockReader struct {
@@ -180,34 +180,35 @@ func TestInstallAllHandler(t *testing.T) {
 			},
 			expectedOutput: "Would you like to install these apps? (y/n): \n",
 		},
-    }
+	}
 
 	for _, test := range tests {
-        t.Run(test.name, func(t *testing.T) {
-            var buf bytes.Buffer
-            log.SetOutput(&buf)
-            defer func() {
-                log.SetOutput(os.Stderr)
-            }()
-            reader := &mockReader{inputs: test.readerInputs}
-            internals := &mockInternals{
-                listAppsToBeInstalled: test.listApps,
-                addAppsToList:         test.addApps,
-                removeAppsFromList:    test.removeApps,
-            }
-            installAll := false
-            addApps := ""
-            removeApps := ""
-            err := InstallAllHandler(&test.appList, &installAll, &addApps, &removeApps, reader, internals)
-            if err != nil {
-                t.Errorf("Unexpected error: %v", err)
-            }
-            output := buf.String()
-            re := regexp.MustCompile(`\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} `)
-            output = re.ReplaceAllString(output, "")
-            if output != test.expectedOutput {
-                t.Errorf("Expected output %q, got %q", test.expectedOutput, output)
-            }
-        })
-    }
+		t.Run(test.name, func(t *testing.T) {
+			var buf bytes.Buffer
+			log.SetOutput(&buf)
+			defer func() {
+				log.SetOutput(os.Stderr)
+			}()
+			reader := &mockReader{inputs: test.readerInputs}
+			internals := &mockInternals{
+				listAppsToBeInstalled: test.listApps,
+				addAppsToList:         test.addApps,
+				removeAppsFromList:    test.removeApps,
+			}
+			installAll := false
+			addApps := ""
+			removeApps := ""
+			err := InstallAllHandler(&test.appList, &installAll, &addApps, &removeApps, reader, internals)
+			if err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+			output := buf.String()
+			// This is to ignore the timestamp in the output due to the log statement
+			re := regexp.MustCompile(`\d{4}/\d{2}/\d{2} \d{2}:\d{2}:\d{2} `)
+			output = re.ReplaceAllString(output, "")
+			if output != test.expectedOutput {
+				t.Errorf("Expected output %q, got %q", test.expectedOutput, output)
+			}
+		})
+	}
 }

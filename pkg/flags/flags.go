@@ -40,7 +40,7 @@ func RemoveAppsHandler(appList *[]string, removeApps string) error {
 	if !found {
 		return fmt.Errorf("%s not found in appList", removeApps)
 	}
-	fmt.Printf("\nRemoved the following app(s): %s \n", removeApps)
+	log.Printf("\nRemoved the following app(s): %s \n", removeApps)
 	removedApps := strings.Split(removeApps, " ")
 	for _, app := range removedApps {
 		for i, a := range *appList {
@@ -64,7 +64,7 @@ type Internals interface {
 }
 func InstallAllHandler(appList *[]string, installAll *bool, addApps *string, removeApps *string, reader UserInputReader, internals Internals) error {
 	internals.ListAppsToBeInstalled(appList)
-	log.Print("Would you like to install these apps? (y/n): ")
+	log.Println("Would you like to install these apps? (y/n): ")
 	text, _ := reader.ReadString('\n')
 	if strings.TrimSpace(strings.ToLower(text)) == "y" {
 		*installAll = true

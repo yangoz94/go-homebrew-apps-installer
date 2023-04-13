@@ -2,31 +2,16 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"flag"
 	"log"
 	"os"
+	"ogi/config"
 	"ogi/pkg/flags"
 	"ogi/pkg/installers"
 	"ogi/pkg/internals"
-
 )
 
-type Config struct {
-	DefaultApps []string `json:"defaultApps"`
-}
-
 func main() {
-	configFile, err := os.ReadFile("config/config.json")
-	if err != nil {
-		log.Fatalf("Error reading config file: %v", err)
-	}
-	var config Config
-	err = json.Unmarshal(configFile, &config)
-	if err != nil {
-		log.Fatalf("Error parsing config file: %v", err)
-	}
-	defaultApps := config.DefaultApps
 
 	installers.InstallHomebrew()
 
@@ -36,27 +21,27 @@ func main() {
 	flag.Parse()
 
 	if *addApps != "" {
-		err := flags.AddAppsHandler(&defaultApps, *addApps)
+		err := flags.AddAppsHandler(&config.DefaultApps, *addApps)
 		if err != nil {
 			log.Fatalf("Error adding apps: %v", err)
 		}
 	}
 
 	if *removeApps != "" {
-		err := flags.RemoveAppsHandler(&defaultApps, *removeApps)
+		err := flags.RemoveAppsHandler(&config.DefaultApps, *removeApps)
 		if err != nil {
 			log.Fatalf("Error removing apps: %v", err)
 		}
 	}
 
 	if !*installAll {
-		err := flags.InstallAllHandler(&defaultApps, installAll, addApps, removeApps,bufio.NewReader(os.Stdin), &internals.DefaultInternals{})
+		err := flags.InstallAllHandler(&config.DefaultApps, installAll, addApps, removeApps, bufio.NewReader(os.Stdin), &internals.DefaultInternals{})
 		if err != nil {
 			log.Fatalf("Error installing apps: %v", err)
 		}
 	}
 
-	err = installers.InstallSelectedApps(&defaultApps)
+	err := installers.InstallSelectedApps(&config.DefaultApps)
 	if err != nil {
 		log.Fatalf("Error installing apps: %v", err)
 	}

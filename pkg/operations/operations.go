@@ -3,6 +3,7 @@ package operations
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -30,10 +31,9 @@ func IsElementInSlice(slice []string, target string) (bool, error) {
 
 func ListAppsToBeInstalled(appList *[]string)  error {
 	if len(*appList) == 0 {
-		fmt.Println("No apps will be installed because the list of app is empty. Exiting...")
-		os.Exit(0)
+		log.Fatal("No apps will be installed because the list of app is empty. Exiting...")	
 	}
-	fmt.Println("The following apps will be installed:")
+	log.Println("The following apps will be installed:")
 	for _, app := range *appList {
 		fmt.Printf("- %s\n", app)
 	}
@@ -42,27 +42,26 @@ func ListAppsToBeInstalled(appList *[]string)  error {
 
 
 func AddAppsToList(appList *[]string) ([]string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Write the name of the apps you want to add (separate by space): ")
-	text, _ := reader.ReadString('\n')
-	apps := strings.TrimSpace(text)
+	apps, err := readAppList(appList)
+	if err != nil {log.Fatal(err)}
+	
 	if apps != "" {
 		addedApps := strings.Split(apps, " ")
 		*appList = append(*appList, addedApps...)
 	}
+	ListAppsToBeInstalled(appList)
 	return *appList, nil
 }
 
 func RemoveAppsFromList(appList *[]string) ([]string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Write the name of the apps you want to remove (separate by space): ")
-	text, _ := reader.ReadString('\n')
-	apps := strings.TrimSpace(text)
+	apps, err := readAppList(appList)
+	if err != nil {log.Fatal(err)}
+
 	if apps != "" {
 		removedApps := strings.Split(apps, " ")
 		_, err := IsElementInSlice(*appList, apps)
 		if  err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		for _, app := range removedApps {
 			for i, a := range *appList {
@@ -75,4 +74,12 @@ func RemoveAppsFromList(appList *[]string) ([]string, error) {
 	}
 	ListAppsToBeInstalled(appList)
 	return *appList, nil
+}
+
+func readAppList(appList *[]string) (string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	log.Println("Write the name of the apps you want to add (separate by space): ")
+	text, _ := reader.ReadString('\n')
+	apps := strings.TrimSpace(text)
+	return apps, nil
 }
