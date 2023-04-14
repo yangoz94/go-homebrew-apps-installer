@@ -23,28 +23,28 @@ func main() {
 
 	//handle flags
 	if *addApps != "" {
-		err := flags.AddAppsHandler(&config.DefaultApps, *addApps)
+		err := flags.AddAppsHandler(&config.DEFAULT_APPS, *addApps)
 		if err != nil {
 			log.Fatalf("Error adding apps: %v", err)
 		}
 	}
 
 	if *removeApps != "" {
-		err := flags.RemoveAppsHandler(&config.DefaultApps, *removeApps)
+		err := flags.RemoveAppsHandler(&config.DEFAULT_APPS, *removeApps)
 		if err != nil {
 			log.Fatalf("Error removing apps: %v", err)
 		}
 	}
 
 	if !*installAll {
-		err := flags.InstallAllHandler(&config.DefaultApps, installAll, addApps, removeApps, bufio.NewReader(os.Stdin), &internals.DefaultInternals{})
+		err := flags.InstallAllHandler(&config.DEFAULT_APPS, installAll, addApps, removeApps, bufio.NewReader(os.Stdin), &internals.DefaultInternals{})
 		if err != nil {
 			log.Fatalf("Error installing apps: %v", err)
 		}
 	}
-	
+
 	// install apps
-	err := installers.InstallSelectedApps(&config.DefaultApps)
+	err := installers.InstallSelectedApps(&config.DEFAULT_APPS)
 	if err != nil {
 		log.Fatalf("Error installing apps: %v", err)
 	}

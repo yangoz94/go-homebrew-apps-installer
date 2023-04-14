@@ -1,6 +1,6 @@
 package config
 
-var DefaultApps = []string{
+var DEFAULT_APPS = []string {
 	"bettertouchtool",
 	"nordvpn",
 	"zoom",
@@ -30,4 +30,5 @@ var DefaultApps = []string{
 	"pycharm",
 	"postman",
 	"docker",
-	"docker-compose"}
+	"docker-compose",
+}
