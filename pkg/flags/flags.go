@@ -64,7 +64,7 @@ type Internals interface {
 }
 func InstallAllHandler(appList *[]string, installAll *bool, addApps *string, removeApps *string, reader UserInputReader, internals Internals) error {
 	internals.ListAppsToBeInstalled(appList)
-	log.Println("Would you like to install these apps? (y/n): ")
+	log.Println("Would you like to install these apps? (y/n) Type (n) to add/remove apps from the given list. ")
 	text, _ := reader.ReadString('\n')
 	if strings.TrimSpace(strings.ToLower(text)) == "y" {
 		*installAll = true
