@@ -4,4 +4,4 @@ You can add or remove casks/formulas from the list to suit your needs using flag
 
 Instructions, Usage and Examples will be added soon.
 
- See the list of packages in the [config](config.go) file.
+ See the list of packages in the config/config.go file.
