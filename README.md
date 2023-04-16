@@ -16,5 +16,7 @@ The app can be used with flags to install the packages without the dialogue menu
 2. Run the app by double clicking on it or through the terminal using the following command in the directory where the app is located:  ```./ogi-app```.  
 3. Follow the instructions on the terminal. Refer to the *Flags* section for more details on the usage with flags.  
 
-
+# RUNNING AND BUILDING THE APP LOCALLY
+```go run cmd/main.go``` : Run the app locally.  
+```go build -o build/ogi-app cmd/ogi-app``` : Build a binary file of the app.  
 
