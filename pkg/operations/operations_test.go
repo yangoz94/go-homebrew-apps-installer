@@ -2,6 +2,7 @@ package operations
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -39,62 +40,135 @@ func TestListAppsToBeInstalled(t *testing.T) {
 	}
 }
 
+
 func TestAddAppsToList(t *testing.T) {
-	// mock the ReadAppList function to return a fixed string
-	ReadAppList = func(appList *[]string) (string, error) {
-		return "app1 app2 app3", nil
-	}
-	// create a test app list
-	appList := []string{"app4", "app5"}
-	// call the function to add apps to the list
-	expected := []string{"app4", "app5", "app1", "app2", "app3"}
-	actual, err := AddAppsToList(&appList)
-	// check for errors
-	if err != nil {
-		t.Errorf("AddAppsToList returned an error: %v", err)
-	}
-	// check if the actual list matches the expected list
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("AddAppsToList returned %v, expected %v", actual, expected)
-	}
+    // Define the test cases as a slice of structs:
+    testCases := []struct {
+        name          string
+        appList       []string
+        appsToAdd     string
+        expectedList  []string
+        expectedError error
+    }{
+        {
+            name:          "Add to empty list",
+            appList:       []string{},
+            appsToAdd:     "app1 app2 app3",
+            expectedList:  []string{"app1", "app2", "app3"},
+            expectedError: nil,
+        },
+		{
+            name:          "Add a single app to non-empty list",
+            appList:       []string{"app1", "app2"},
+            appsToAdd:     "app3",
+            expectedList:  []string{"app1", "app2", "app3"},
+            expectedError: nil,
+        },
+        {
+            name:          "Add multiple apps to a non-empty list",
+            appList:       []string{"app1", "app2"},
+            appsToAdd:     "app3 app4",
+            expectedList:  []string{"app1", "app2", "app3", "app4"},
+            expectedError: nil,
+        },
+        {
+            name:          "Add empty string",
+            appList:       []string{"app1", "app2"},
+            appsToAdd:     "",
+            expectedList:  []string{"app1", "app2"},
+            expectedError: nil,
+        },
+    }
+
+    // Loop through the test cases and run each one:
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            result, err := AddAppsToList(&tc.appList, tc.appsToAdd)
+
+            // Check that the app list was modified correctly:
+            if !reflect.DeepEqual(result, tc.expectedList) {
+                t.Errorf("Expected %v, but got %v", tc.expectedList, result)
+            }
+
+            // Check that the error is nil:
+            if err != tc.expectedError {
+                t.Errorf("Expected error %v, but got %v", tc.expectedError, err)
+            }
+        })
+    }
 }
 
 func TestRemoveAppsFromList(t *testing.T) {
-	// mock the ReadAppList function to return a fixed string
-	ReadAppList = func(appList *[]string) (string, error) {
-		return "app2 app4", nil
-	}
-	// create a test app list
-	appList := []string{"app1", "app2", "app3", "app4", "app5"}
-	// call the function to remove apps from the list
-	expected := []string{"app1", "app3", "app5"}
-	actual, err := RemoveAppsFromList(&appList)
-	// check for errors
-	if err != nil {
-		t.Errorf("RemoveAppsFromList returned an error: %v", err)
-	}
-	// check if the actual list matches the expected list
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("RemoveAppsFromList returned %v, expected %v", actual, expected)
-	}
-}
+    // Define the test cases as a slice of structs:
+    testCases := []struct {
+        name          string
+        appList       []string
+        appsToRemove  string
+        expectedList  []string
+        expectedError string
+    }{
+        {
+            name:          "Remove one app",
+            appList:       []string{"app1", "app2", "app3"},
+            appsToRemove:  "app1",
+            expectedList:  []string{"app2", "app3"},
+            expectedError: "",
+        },
+        {
+            name:          "Remove multiple apps",
+            appList:       []string{"app1", "app2", "app3"},
+            appsToRemove:  "app1 app2",
+            expectedList:  []string{"app3"},
+            expectedError: "",
+        },
+        {
+            name:          "Remove all apps",
+            appList:       []string{"app1", "app2", "app3"},
+            appsToRemove:  "app1 app2 app3",
+            expectedList:  []string{},
+            expectedError: "",
+        },
+        {
+            name:          "Remove a non-existent app",
+            appList:       []string{"app1", "app2", "app3"},
+            appsToRemove:  "app4",
+            expectedList:  []string{"app1", "app2", "app3"},
+            expectedError: "App(s) app4 is/are not in the list of apps to be installed",
+        },
+        {
+            name:          "Remove empty string",
+            appList:       []string{"app1", "app2", "app3"},
+            appsToRemove:  "",
+            expectedList:  []string{"app1", "app2", "app3"},
+            expectedError: "",
+        },
+    }
 
-func TestReadAppList(t *testing.T) {
-	// mock the ReadAppList function to return a fixed string
-	ReadAppList = func(appList *[]string) (string, error) {
-		return "Test", nil
-	}
-	// create a test app list
-	appList := []string{}
-	// call the function to read apps from user input
-	expected := "Test"
-	actual, err := ReadAppList(&appList)
-	// check for errors
-	if err != nil {
-		t.Errorf("ReadAppList returned an error: %v", err)
-	}
-	// check if the actual string matches the expected string
-	if actual != expected {
-		t.Errorf("ReadAppList returned %v, expected %v", actual, expected)
-	}
+    // Loop through the test cases and run each one:
+    for _, tc := range testCases {
+        t.Run(tc.name, func(t *testing.T) {
+            // Create a copy of the app list for each test case:
+            list := make([]string, len(tc.appList))
+            copy(list, tc.appList)
+
+            // Call the RemoveAppsFromList function and check the result:
+            result, err := RemoveAppsFromList(&list, tc.appsToRemove)
+
+            if !reflect.DeepEqual(result, tc.expectedList) {
+                t.Errorf("Expected %v, but got %v", tc.expectedList, result)
+            }
+
+            if tc.expectedError != "" && err == nil {
+                t.Errorf("Expected error containing '%s', but got no error", tc.expectedError)
+            }
+
+            if tc.expectedError == "" && err != nil {
+                t.Errorf("Expected no error, but got '%v'", err)
+            }
+
+            if tc.expectedError != "" && err != nil && !strings.Contains(err.Error(), tc.expectedError) {
+                t.Errorf("Expected error containing '%s', but got '%v'", tc.expectedError, err)
+            }
+        })
+    }
 }

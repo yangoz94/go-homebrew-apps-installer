@@ -12,6 +12,9 @@ import (
 )
 
 func main() {
+	//remove timestamp from logs for better readability and console interaction(tests will still work if this is removed)
+	log.SetFlags(0)
+
 	// Check if homebrew is installed.Skip if installed, install if not. Throws error if installation fails.
 	installers.InstallHomebrew()
 

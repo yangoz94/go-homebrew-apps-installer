@@ -137,8 +137,8 @@ func (m *mockReader) ReadString(delim byte) (string, error) {
 
 type mockInternals struct {
 	listAppsToBeInstalled func(appList *[]string)
-	addAppsToList         func(appList *[]string) ([]string, error)
-	removeAppsFromList    func(appList *[]string) ([]string, error)
+	addAppsToList         func(appList *[]string, apps string) ([]string, error)
+	removeAppsFromList    func(appList *[]string, apps string) ([]string, error)
 }
 
 func (m *mockInternals) ListAppsToBeInstalled(appList *[]string) {
@@ -147,16 +147,16 @@ func (m *mockInternals) ListAppsToBeInstalled(appList *[]string) {
 	}
 }
 
-func (m *mockInternals) AddAppsToList(appList *[]string) ([]string, error) {
+func (m *mockInternals) AddAppsToList(appList *[]string, apps string) ([]string, error) {
 	if m.addAppsToList != nil {
-		return m.addAppsToList(appList)
+		return m.addAppsToList(appList, apps)
 	}
 	return nil, nil
 }
 
-func (m *mockInternals) RemoveAppsFromList(appList *[]string) ([]string, error) {
+func (m *mockInternals) RemoveAppsFromList(appList *[]string, apps string) ([]string, error) {
 	if m.removeAppsFromList != nil {
-		return m.removeAppsFromList(appList)
+		return m.removeAppsFromList(appList, apps)
 	}
 	return nil, nil
 }
@@ -167,8 +167,8 @@ func TestInstallAllHandler(t *testing.T) {
 		appList        []string
 		readerInputs   []string
 		listApps       func(appList *[]string)
-		addApps        func(appList *[]string) ([]string, error)
-		removeApps     func(appList *[]string) ([]string, error)
+		addApps        func(appList *[]string, apps string) ([]string, error)
+		removeApps     func(appList *[]string, apps string) ([]string, error)
 		expectedOutput string
 	}{
 		{
@@ -178,7 +178,16 @@ func TestInstallAllHandler(t *testing.T) {
 			listApps: func(appList *[]string) {
 				*appList = []string{"app1", "app2", "app3"}
 			},
-			expectedOutput: "Would you like to install these apps? (y/n): \n",
+			expectedOutput: "Would you like to install these apps? (y/n) Type (n) to add/remove apps from the given list.\n",
+		},
+		{
+			name:         "Test installing all apps with no apps to install",
+			appList:      []string{},
+			readerInputs: []string{"y\n"},
+			listApps: func(appList *[]string) {
+				*appList = []string{}
+			},
+			expectedOutput: "Would you like to install these apps? (y/n) Type (n) to add/remove apps from the given list.\n",
 		},
 	}
 

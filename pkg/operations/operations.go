@@ -1,6 +1,8 @@
 package operations
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -30,7 +32,7 @@ func IsElementInSlice(slice []string, target string) (bool, error) {
 
 func ListAppsToBeInstalled(appList *[]string)  error {
 	if len(*appList) == 0 {
-		log.Fatal("No apps will be installed because the list of app is empty. Exiting...")	
+		return errors.New("no apps will be installed because the list of app is empty - exiting")
 	}
 	log.Println("The following apps will be installed:")
 	for _, app := range *appList {
@@ -40,48 +42,48 @@ func ListAppsToBeInstalled(appList *[]string)  error {
 }
 
 
-func AddAppsToList(appList *[]string) ([]string, error) {
-	apps, err := ReadAppList(appList)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if apps != "" {
-		addedApps := strings.Split(apps, " ")
+func AddAppsToList(appList *[]string, appsToAdd string) ([]string, error) {
+	if appsToAdd != "" {
+		addedApps := strings.Split(appsToAdd, " ")
 		*appList = append(*appList, addedApps...)
 	}
 	ListAppsToBeInstalled(appList)
 	return *appList, nil
 }
 
-func RemoveAppsFromList(appList *[]string) ([]string, error) {
-	apps, err := ReadAppList(appList)
-	if err != nil {
-		log.Fatal(err)
+func RemoveAppsFromList(appList *[]string, appsToRemove string) ([]string, error) {
+	if appsToRemove == "" {
+		return *appList, nil
 	}
-
-	if apps != "" {
-		removedApps := strings.Split(apps, " ")
-		_, err := IsElementInSlice(*appList, apps)
-		if err != nil {
-			log.Fatal(err)
-		}
-		for _, app := range removedApps {
-			for i, a := range *appList {
-				if a == app {
-					*appList = append((*appList)[:i], (*appList)[i+1:]...)
-					break
-				}
+	removedApps := strings.Split(appsToRemove, " ")
+	notFound := []string{}
+	for _, app := range removedApps {
+		found := false
+		for i, a := range *appList {
+			if a == app {
+				*appList = append((*appList)[:i], (*appList)[i+1:]...)
+				found = true
+				break
 			}
 		}
+		if !found {
+			notFound = append(notFound, app)
+		}
+	}
+	if len(notFound) > 0 {
+		return *appList, fmt.Errorf("App(s) %s is/are not in the list of apps to be installed", strings.Join(notFound, ", "))
 	}
 	ListAppsToBeInstalled(appList)
 	return *appList, nil
 }
 
-// change the type of ReadAppList to match fred
-var ReadAppList func(*[]string) (string, error) = fred
 
-func fred(appList *[]string) (string, error) {
-	return "Test", nil
+func ReadAppList() string {
+	fmt.Println("Write the name of the apps you want to add (separate by space): ")
+	text, err := bufio.NewReader(os.Stdin).ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+	apps := strings.TrimSpace(text)
+	return apps
 }
