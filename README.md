@@ -4,6 +4,10 @@ You can add or remove casks/formulas from the list to suit your needs using flag
 
 See the list of packages in the config/config.go file.  
 
+# SAMPLE USAGE
+```./ogi-app -a "adobe-acrobat-pro authy " -r "norvpn zoom-us"``` : Add "adobe-acrobat-pro" and "authy" to the list of packages to be installed and remove "norvpn" and "zoom-us" from the list of packages to be installed.  
+```./ogi-app -all``` : Install all the packages directly without the dialogue menu.  
+
 # FLAGS
 The app can be used with flags to install the packages without the dialogue menu.  
 ```-a``` : Add package(s) to the list of packages to be installed.  
@@ -19,4 +23,5 @@ The app can be used with flags to install the packages without the dialogue menu
 # RUNNING AND BUILDING THE APP LOCALLY
 ```go run cmd/main.go``` : Run the app locally.  
 ```go build -o build/ogi-app cmd/ogi-app``` : Build a binary file of the app.  
+
 

@@ -3,7 +3,7 @@ package config
 var DEFAULT_APPS = []string {
 	"bettertouchtool",
 	"nordvpn",
-	"zoom",
+	"zoom-us",
 	"webex",
 	"telegram",
 	"daisydisk",
