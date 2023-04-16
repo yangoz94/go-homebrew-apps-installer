@@ -15,14 +15,19 @@ func main() {
 	//remove timestamp from logs for better readability and console interaction(tests will still work if this is removed)
 	log.SetFlags(0)
 
-	// Check if homebrew is installed.Skip if installed, install if not. Throws error if installation fails.
-	installers.InstallHomebrew()
-
 	// flags to customize the list of apps to install
 	addApps := flag.String("a", "", "Add additional apps (separate by space)")
 	removeApps := flag.String("r", "", "Remove apps (separate by space)")
 	installAll := flag.Bool("all", false, "Install all apps")
 	flag.Parse()
+
+	// check if flags are used correctly
+	if *installAll && (*addApps != "" || *removeApps != "") {
+		log.Fatalf("Error: Cannot use -all flag with -a or -r flags")
+	}
+
+	// Check if homebrew is installed.Skip if installed, install if not. Throws error if installation fails.
+	installers.InstallHomebrew()
 
 	//handle flags
 	if *addApps != "" {

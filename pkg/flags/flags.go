@@ -11,7 +11,7 @@ import (
 )
 
 func AddAppsHandler(appList *[]string, addApps string) error {
-    fmt.Printf("\nAdditional apps to be installed: %s \n", addApps)
+    fmt.Printf("Additional apps to be installed: %s ", addApps)
     newApps := strings.Split(addApps, " ")
     for _, app := range newApps {
         if !contains(*appList, app) {

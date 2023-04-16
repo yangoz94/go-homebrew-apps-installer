@@ -2,12 +2,6 @@ package internals
 
 import "ogi/pkg/operations"
 
-type Internals interface {
-	ListAppsToBeInstalled(appList *[]string)
-	AddAppsToList(appList *[]string, apps string) ([]string, error)
-	RemoveAppsFromList(appList *[]string, apps string) ([]string, error)
-}
-
 type DefaultInternals struct{}
 
 func (d *DefaultInternals) ListAppsToBeInstalled(appList *[]string) {
@@ -20,6 +14,13 @@ func (d *DefaultInternals) AddAppsToList(appList *[]string, apps string) ([]stri
 
 func (d *DefaultInternals) RemoveAppsFromList(appList *[]string, apps string) ([]string, error) {
 	return operations.RemoveAppsFromList(appList, apps)
+}
+
+// for flags package
+type Internals interface {
+	ListAppsToBeInstalled(appList *[]string)
+	AddAppsToList(appList *[]string, apps string) ([]string, error)
+	RemoveAppsFromList(appList *[]string, apps string) ([]string, error)
 }
 
 
