@@ -81,8 +81,13 @@ func InstallAllHandler(appList *[]string, installAll *bool, addApps *string, rem
 				log.Printf("Additional apps to be installed: %s \n", apps)
 			} else {
 				*appList, err = internals.RemoveAppsFromList(appList, apps)
-				log.Printf("Removed the following app(s): %s \n", apps)
+				for _, app := range strings.Split(apps, " ") {
+					if !contains(*appList, app) {
+						log.Fatal("App not found in the list of apps to be installed")
+					}
+				}
 			}
+						
 			if err != nil {
 				log.Fatal(err)
 			}
