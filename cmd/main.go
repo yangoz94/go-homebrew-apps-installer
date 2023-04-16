@@ -21,7 +21,7 @@ func main() {
 	// flags to customize the list of apps to install
 	addApps := flag.String("a", "", "Add additional apps (separate by space)")
 	removeApps := flag.String("r", "", "Remove apps (separate by space)")
-	installAll := flag.Bool("installAll", false, "Install all apps")
+	installAll := flag.Bool("all", false, "Install all apps")
 	flag.Parse()
 
 	//handle flags
