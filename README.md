@@ -1,8 +1,12 @@
 # go-homebrew-apps-installer
 This small script installs a list of my favorite homebrew packages concurrently(e.g. after formatting your MacOS device).  
+  
 You can add or remove casks/formulas from the list to suit your needs using flags or dialog menu through the terminal.  
 
 See the list of packages in the config/config.go file.  
+
+# Demo  
+![homebrew_installer](https://user-images.githubusercontent.com/95255319/232333747-9c03b083-e7e4-4840-acb7-2a850ae98bc7.gif)
 
 # Sample Usage
 ```./ogi-app -a "adobe-acrobat-pro authy " -r "nordvpn zoom-us spotify"``` : Add adobe-acrobat-pro and authy to the list of packages to be installed and remove nordvpn, zoom-us and spotify from the list of packages to be installed.  
