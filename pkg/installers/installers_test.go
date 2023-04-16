@@ -21,7 +21,7 @@ func TestInstallSelectedApps(t *testing.T) {
 	if err != nil {
 		t.Errorf("Error installing apps: %v", err)
 	}
-	//uninstall apps
+	//uninstall apps for cleanup after the test
 	for _, app := range appList {
 		_, err := exec.Command("brew", "uninstall", app).Output()
 		log.Printf("Uninstalling %s...", app)
