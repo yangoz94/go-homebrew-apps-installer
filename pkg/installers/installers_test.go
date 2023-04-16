@@ -16,8 +16,6 @@ func TestInstallHomebrew(t *testing.T) {
 }
 
 func TestInstallSelectedApps(t *testing.T) {
-	//set the timeout to 3 minutes for testability 
-	// (brew install can take a long time on slower machines)
 	appList := []string{"lynx", "gray"}
 	err := InstallSelectedApps(&appList)
 	if err != nil {
