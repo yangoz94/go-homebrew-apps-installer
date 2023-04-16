@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"sync"
 	"time"
 	"ogi/pkg/operations"
 )
@@ -26,21 +25,16 @@ func InstallHomebrew() {
 }
 
 func InstallSelectedApps(appList *[]string) error {
-	start := time.Now()
-	var wg sync.WaitGroup
-	for _, app := range *appList {
-		wg.Add(1)
-		go func(app string) {
-			defer wg.Done()
-			fmt.Printf("Installing %s...\n", app)
-			if err := operations.RunCommand("env", "HOMEBREW_NO_AUTO_UPDATE=1", "brew", "install", app); err != nil {
-				log.Fatal(err)
-			}
-			log.Printf("App %s installed successfully", app)
-		}(app)
-	}
-	wg.Wait()
-	fmt.Printf("All apps have been installed in %s\n", time.Since(start))
-	return nil
+    start := time.Now()
+    for _, app := range *appList {
+        fmt.Printf("Installing %s...\n", app)
+        if err := operations.RunCommand("env", "HOMEBREW_NO_AUTO_UPDATE=1", "brew", "install", app); err != nil {
+            log.Fatal(err)
+        }
+        log.Printf("App %s installed successfully", app)
+    }
+    fmt.Printf("All apps have been installed in %s\n", time.Since(start))
+    return nil
 }
+
 
