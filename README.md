@@ -5,7 +5,7 @@ You can add or remove casks/formulas from the list to suit your needs using flag
 See the list of packages in the config/config.go file.  
 
 # SAMPLE USAGE
-```./ogi-app -a "adobe-acrobat-pro authy " -r "norvpn zoom-us"``` : Add "adobe-acrobat-pro" and "authy" to the list of packages to be installed and remove "norvpn" and "zoom-us" from the list of packages to be installed.  
+```./ogi-app -a "adobe-acrobat-pro authy " -r "nordvpn zoom-us spotify"``` : Add adobe-acrobat-pro and authy to the list of packages to be installed and remove nordvpn, zoom-us and spotify from the list of packages to be installed.  
 ```./ogi-app -all``` : Install all the packages directly without the dialogue menu.  
 
 # FLAGS
