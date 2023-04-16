@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"flag"
 	"log"
-	"os"
 	"ogi/config"
 	"ogi/pkg/flags"
 	"ogi/pkg/installers"
 	"ogi/pkg/internals"
+	"os"
 )
 
 func main() {
@@ -19,8 +19,8 @@ func main() {
 	installers.InstallHomebrew()
 
 	// flags to customize the list of apps to install
-	addApps := flag.String("add", "", "Add additional apps (separate by space)")
-	removeApps := flag.String("remove", "", "Remove apps (separate by space)")
+	addApps := flag.String("a", "", "Add additional apps (separate by space)")
+	removeApps := flag.String("r", "", "Remove apps (separate by space)")
 	installAll := flag.Bool("installAll", false, "Install all apps")
 	flag.Parse()
 
