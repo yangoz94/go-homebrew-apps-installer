@@ -26,6 +26,6 @@ The app can be used with flags to install the packages without the dialogue menu
 
 # Running and building the app locally from the source code
 ```make run``` or ```go run cmd/main.go``` : Run the app locally.  
-```make build``` or ```go build -o build/ogi-app cmd/ogi-app``` : Build a binary file of the app.  
+```make build``` or ```go build -o build/ogi-app cmd/main.go``` : Build a binary file of the app.  
 
 
