@@ -1,6 +1,8 @@
 package internals
 
-import "ogi/pkg/operations"
+import (
+	"ogi/pkg/operations"
+)
 
 type DefaultInternals struct{}
 
@@ -22,5 +24,3 @@ type Internals interface {
 	AddAppsToList(appList *[]string, apps string) ([]string, error)
 	RemoveAppsFromList(appList *[]string, apps string) ([]string, error)
 }
-
-
