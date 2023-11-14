@@ -6,28 +6,18 @@ import (
 	"log"
 	"ogi/pkg/internals"
 	"ogi/pkg/operations"
-	"os"
 	"strings"
 )
 
 func AddAppsHandler(appList *[]string, addApps string) error {
-    fmt.Printf("Additional apps to be installed: %s ", addApps)
-    newApps := strings.Split(addApps, " ")
-    for _, app := range newApps {
-        if !contains(*appList, app) {
-            *appList = append(*appList, app)
-        }
+	fmt.Printf("Additional apps to be installed: %s ", addApps)
+	newApps := strings.Split(addApps, " ")
+	for _, app := range newApps {
+		if !operations.Contains(*appList, app) {
+			*appList = append(*appList, app)
+		}
 	}
-    return nil
-}
-
-func contains(appList []string, app string) bool {
-    for _, a := range appList {
-        if a == app {
-            return true
-        }
-    }
-    return false
+	return nil
 }
 
 func RemoveAppsHandler(appList *[]string, removeApps string) error {
@@ -58,45 +48,56 @@ type UserInputReader interface {
 	ReadString(delim byte) (string, error)
 }
 
-
 func InstallAllHandler(appList *[]string, installAll *bool, addApps *string, removeApps *string, reader UserInputReader, internals internals.Internals) error {
 	internals.ListAppsToBeInstalled(appList)
 
-	log.Println("Would you like to install these apps? (y/n) Type (n) to add/remove apps from the given list.")
-	text, _ := reader.ReadString('\n')
-
-	if strings.TrimSpace(strings.ToLower(text)) == "y" {
-		*installAll = true
-	} else {
-		log.Print("Do you want to add or remove apps from the list above? (add/remove): ")
+	for {
+		log.Println("Would you like to install these apps? (y/n) Type (n) to add/remove apps from the given list.")
 		text, _ := reader.ReadString('\n')
 		text = strings.TrimSpace(strings.ToLower(text))
 
 		switch text {
-		case "add", "remove":
-			apps := operations.ReadAppList()
-			var err error
-			if text == "add" {
-				*appList, err = internals.AddAppsToList(appList, apps)
-				log.Printf("Additional apps to be installed: %s \n", apps)
-			} else {
-				*appList, err = internals.RemoveAppsFromList(appList, apps)
-				for _, app := range strings.Split(apps, " ") {
-					if !contains(*appList, app) {
-						log.Fatal("App not found in the list of apps to be installed")
+		case "y":
+			*installAll = true
+			return nil
+		case "n":
+			for {
+				log.Print("Do you want to add or remove apps from the list above? (add/remove): ")
+				text, _ := reader.ReadString('\n')
+				text = strings.TrimSpace(strings.ToLower(text))
+
+				switch text {
+				case "add", "remove":
+					apps := operations.ReadAppList()
+					if len(apps) == 0 {
+						log.Println("No apps specified. Please enter the names of the app(s)")
+						continue
 					}
+					var err error
+					if text == "add" {
+						*appList, err = internals.AddAppsToList(appList, apps)
+						log.Printf("Additional apps to be installed: %s \n", apps)
+					} else {
+						for _, app := range strings.Split(apps, " ") {
+							if !operations.Contains(*appList, app) {
+								log.Fatal("App not found in the list of apps to be installed")
+							}
+						}
+						*appList, err = internals.RemoveAppsFromList(appList, apps)
+					}
+
+					if err != nil {
+						log.Fatal(err)
+					}
+					log.Printf("Updated to be installed: %s \n", *appList)
+					return nil
+				default:
+					log.Println("Invalid command. Please enter 'add' or 'remove'.")
 				}
 			}
-						
-			if err != nil {
-				log.Fatal(err)
-			}
-			log.Printf("Updated to be installed: %s \n", *appList)
 		default:
-			log.Println("Invalid flag. No apps will be installed.")
-			os.Exit(0)
+			log.Println("Invalid command. Please enter 'y' or 'n'.")
 		}
 	}
 
-	return nil
 }

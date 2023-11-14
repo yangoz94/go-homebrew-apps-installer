@@ -18,19 +18,18 @@ func RunCommand(name string, arg ...string) error {
 }
 
 func IsElementInSlice(slice []string, target string) (bool, error) {
-    targets := strings.Split(target, " ")
-    for _, t := range targets {
-        for _, element := range slice {
-            if element == t {
-                return true, nil
-            }
-        }
-    }
-    return false, fmt.Errorf("App(s) %s is/are not in the list of apps to be installed", target)
+	targets := strings.Split(target, " ")
+	for _, t := range targets {
+		for _, element := range slice {
+			if element == t {
+				return true, nil
+			}
+		}
+	}
+	return false, fmt.Errorf("App(s) %s is/are not in the list of apps to be installed", target)
 }
 
-
-func ListAppsToBeInstalled(appList *[]string)  error {
+func ListAppsToBeInstalled(appList *[]string) error {
 	if len(*appList) == 0 {
 		return errors.New("no apps will be installed because the list of app is empty - exiting")
 	}
@@ -41,11 +40,23 @@ func ListAppsToBeInstalled(appList *[]string)  error {
 	return nil
 }
 
+func Contains(appList []string, app string) bool {
+	for _, a := range appList {
+		if a == app {
+			return true
+		}
+	}
+	return false
+}
 
 func AddAppsToList(appList *[]string, appsToAdd string) ([]string, error) {
 	if appsToAdd != "" {
 		addedApps := strings.Split(appsToAdd, " ")
-		*appList = append(*appList, addedApps...)
+		for _, app := range addedApps {
+			if !Contains(*appList, app) {
+				*appList = append(*appList, app)
+			}
+		}
 	}
 	ListAppsToBeInstalled(appList)
 	return *appList, nil
@@ -77,9 +88,8 @@ func RemoveAppsFromList(appList *[]string, appsToRemove string) ([]string, error
 	return *appList, nil
 }
 
-
 func ReadAppList() string {
-	fmt.Println("Write the name of the apps you want to add (separate by space): ")
+	fmt.Println("Write the name of the apps (separate by space): ")
 	text, err := bufio.NewReader(os.Stdin).ReadString('\n')
 	if err != nil {
 		log.Fatal(err)
