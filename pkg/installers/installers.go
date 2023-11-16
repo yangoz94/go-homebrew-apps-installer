@@ -16,7 +16,7 @@ func InstallHomebrew() {
 		return
 	}
 
-	cmd := exec.Command("/bin/bash", "-c", "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)")
+	cmd := exec.Command("/bin/zsh", "-c", "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)")
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
 		log.Fatalf("Error installing Homebrew: %v", err)
