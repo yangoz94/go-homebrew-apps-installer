@@ -3,10 +3,10 @@ package installers
 import (
 	"fmt"
 	"log"
+	"ogi/pkg/operations"
 	"os"
 	"os/exec"
 	"time"
-	"ogi/pkg/operations"
 )
 
 func InstallHomebrew() {
@@ -25,16 +25,14 @@ func InstallHomebrew() {
 }
 
 func InstallSelectedApps(appList *[]string) error {
-    start := time.Now()
-    for _, app := range *appList {
-        fmt.Printf("Installing %s...\n", app)
-        if err := operations.RunCommand("env", "HOMEBREW_NO_AUTO_UPDATE=1", "brew", "install", app); err != nil {
-            log.Fatal(err)
-        }
-        log.Printf("App %s installed successfully", app)
-    }
-    fmt.Printf("All apps have been installed in %s\n", time.Since(start))
-    return nil
+	start := time.Now()
+	for _, app := range *appList {
+		fmt.Printf("Installing %s...\n", app)
+		if err := operations.RunCommand("env", "HOMEBREW_NO_AUTO_UPDATE=1", "brew", "install", app); err != nil {
+			log.Fatal(err)
+		}
+		log.Printf("App %s installed successfully", app)
+	}
+	fmt.Printf("All apps have been installed in %s\n", time.Since(start))
+	return nil
 }
-
-
